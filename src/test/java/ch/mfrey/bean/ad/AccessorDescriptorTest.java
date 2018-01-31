@@ -8,10 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.mfrey.bean.ad.AccessorDescriptorBuilder.AccessorDescriptorBuilderListener;
+import org.junit.Assert;
 
-public class AccessorDescriptorTests {
+public class AccessorDescriptorTest {
     private static final String ONBUILD = "ONBUILD";
-    private static final Logger log = LoggerFactory.getLogger(AccessorDescriptorTests.class);
+    private static final Logger log = LoggerFactory.getLogger(AccessorDescriptorTest.class);
 
     @Test
     public void test() {
@@ -35,18 +36,21 @@ public class AccessorDescriptorTests {
         accessorDescriptors.forEach(ad -> {
             log.info("{} {}",
                     ad.getAccessorContext().getAttribute(ONBUILD), ad);
+            Assert.assertEquals(ad.getPropertyLevel(), (int) ad.getAccessorContext().getAttribute(ONBUILD));
         });
 
         accessorDescriptors = factory.getAccessorDescriptors(B.class);
         accessorDescriptors.forEach(ad -> {
             log.info("{} {}",
                     ad.getAccessorContext().getAttribute(ONBUILD), ad);
+            Assert.assertEquals(ad.getPropertyLevel(), (int) ad.getAccessorContext().getAttribute(ONBUILD));
         });
 
         accessorDescriptors = factory.getAccessorDescriptors(A.class);
         accessorDescriptors.forEach(ad -> {
             log.info("{} {}",
                     ad.getAccessorContext().getAttribute(ONBUILD), ad);
+            Assert.assertEquals(ad.getPropertyLevel(), (int) ad.getAccessorContext().getAttribute(ONBUILD));
         });
     }
 
