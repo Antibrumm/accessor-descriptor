@@ -102,7 +102,7 @@ public class AccessorDescriptorBuilder {
             final PropertyDescriptor propertyDescriptor) {
         AccessorDescriptorBuilder copy = copy();
         copy.fullPropertyAccessor = copy.fullPropertyAccessor == null ? name : copy.fullPropertyAccessor + "." + name;
-        copy.propertyAccessor = copy.fullPropertyAccessor.replaceAll("(\\[.*\\])?", "");
+        copy.propertyAccessor = copy.fullPropertyAccessor.replaceAll("(\\[.*?\\])?", "");
         copy.propertyDescriptors.add(propertyDescriptor);
         return copy;
     }
