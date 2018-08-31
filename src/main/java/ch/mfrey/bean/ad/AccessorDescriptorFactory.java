@@ -80,9 +80,7 @@ public class AccessorDescriptorFactory {
                 }
             }
             accessorDescriptors.addAll(currentADs);
-        } catch (
-
-        Exception e) {
+        } catch (Exception e) {
             log.error("ERROR", e);
         }
     }
