@@ -11,17 +11,19 @@ import java.util.List;
  */
 public class AccessorDescriptorBuilder {
 
+    public static final String INDEXED_ACCESSOR_PART = "\\[.*?\\]";
+
     /**
      * Builder.
      *
      * @param type
      *            the type
-     * @param liseners
+     * @param listeners
      * @return the accessor descriptor builder
      */
     public static AccessorDescriptorBuilder builder(final Class<?> type,
-            final List<AccessorDescriptorBuilderListener> liseners) {
-        return new AccessorDescriptorBuilder(type, liseners);
+            final List<AccessorDescriptorBuilderListener> listeners) {
+        return new AccessorDescriptorBuilder(type, listeners);
     }
 
     protected AccessorContext accessorContext;
@@ -102,13 +104,12 @@ public class AccessorDescriptorBuilder {
             final PropertyDescriptor propertyDescriptor) {
         AccessorDescriptorBuilder copy = copy();
         copy.fullPropertyAccessor = copy.fullPropertyAccessor == null ? name : copy.fullPropertyAccessor + "." + name;
-        copy.propertyAccessor = copy.fullPropertyAccessor.replaceAll("(\\[.*?\\])?", "");
+        copy.propertyAccessor = copy.fullPropertyAccessor.replaceAll(INDEXED_ACCESSOR_PART, "");
         copy.propertyDescriptors.add(propertyDescriptor);
         return copy;
     }
 
     public interface AccessorDescriptorBuilderListener {
         AccessorDescriptorBuilder onBuild(AccessorDescriptorBuilder builder);
-
     }
 }

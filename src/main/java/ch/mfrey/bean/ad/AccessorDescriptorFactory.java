@@ -39,42 +39,46 @@ public class AccessorDescriptorFactory {
             for (PropertyDescriptor pd : Introspector.getBeanInfo(currentClass).getPropertyDescriptors()) {
                 Class<?> returnType = pd.getPropertyType();
                 if (returnType.isArray()) {
-                    AccessorDescriptorBuilder currentBuilder = buildAccessorDescriptor(currentADs,
-                            accessorDescriptorBuilder.withPropertyDescriptor(pd.getName() + "[]", pd));
+                    AccessorDescriptorBuilder currentBuilder =
+                            accessorDescriptorBuilder.withPropertyDescriptor(pd.getName() + "[]", pd);
+                    buildAccessorDescriptor(currentADs, currentBuilder);
                     buildPropertyAccessors(currentBuilder, returnType.getComponentType(),
                             new ArrayList<>(lProcessedClasses),
                             currentADs);
+                } else if (Collection.class.isAssignableFrom(returnType)
+                        && pd.getReadMethod().getGenericReturnType() instanceof ParameterizedType) {
+                    ParameterizedType parameterizedType = (ParameterizedType) pd.getReadMethod().getGenericReturnType();
+                    if (parameterizedType.getActualTypeArguments()[0] instanceof Class) {
+                        AccessorDescriptorBuilder currentBuilder =
+                                accessorDescriptorBuilder.withPropertyDescriptor(pd.getName() + "[]", pd);
+                        buildAccessorDescriptor(currentADs, currentBuilder);
+                        buildPropertyAccessors(currentBuilder, (Class<?>) parameterizedType.getActualTypeArguments()[0],
+                                new ArrayList<>(lProcessedClasses),
+                                currentADs);
+                    }
                 } else if (Map.class.isAssignableFrom(returnType) && pd.getReadMethod() != null
                         && pd.getReadMethod().getGenericReturnType() instanceof ParameterizedType) {
                     ParameterizedType parameterizedType = (ParameterizedType) pd.getReadMethod().getGenericReturnType();
                     if (parameterizedType.getActualTypeArguments()[0] instanceof Class) {
-                        AccessorDescriptorBuilder currentBuilder = buildAccessorDescriptor(currentADs,
-                                accessorDescriptorBuilder.withPropertyDescriptor(pd.getName() + "[KEY]", pd));
+                        AccessorDescriptorBuilder currentBuilder =
+                                accessorDescriptorBuilder.withPropertyDescriptor(pd.getName() + "[KEY]", pd);
+                        buildAccessorDescriptor(currentADs, currentBuilder);
                         buildPropertyAccessors(currentBuilder, (Class<?>) parameterizedType.getActualTypeArguments()[0],
                                 new ArrayList<>(lProcessedClasses),
                                 currentADs);
                     }
                     if (parameterizedType.getActualTypeArguments()[1] instanceof Class) {
-                        AccessorDescriptorBuilder currentBuilder = buildAccessorDescriptor(currentADs,
-                                accessorDescriptorBuilder.withPropertyDescriptor(pd.getName() + "[VALUE]", pd));
+                        AccessorDescriptorBuilder currentBuilder =
+                                accessorDescriptorBuilder.withPropertyDescriptor(pd.getName() + "[VALUE]", pd);
+                        buildAccessorDescriptor(currentADs, currentBuilder);
                         buildPropertyAccessors(currentBuilder, (Class<?>) parameterizedType.getActualTypeArguments()[1],
                                 new ArrayList<>(lProcessedClasses),
                                 currentADs);
                     }
-                } else if (Collection.class.isAssignableFrom(returnType)
-                        && pd.getReadMethod().getGenericReturnType() instanceof ParameterizedType) {
-                    ParameterizedType parameterizedType = (ParameterizedType) pd.getReadMethod().getGenericReturnType();
-                    if (parameterizedType.getActualTypeArguments()[0] instanceof Class) {
-                        AccessorDescriptorBuilder currentBuilder = buildAccessorDescriptor(currentADs,
-                                accessorDescriptorBuilder.withPropertyDescriptor(pd.getName() + "[]", pd));
-                        buildPropertyAccessors(currentBuilder, (Class<?>) parameterizedType.getActualTypeArguments()[0],
-                                new ArrayList<>(lProcessedClasses),
-                                currentADs);
-
-                    }
                 } else {
-                    AccessorDescriptorBuilder currentBuilder = buildAccessorDescriptor(currentADs,
-                            accessorDescriptorBuilder.withPropertyDescriptor(pd.getName(), pd));
+                    AccessorDescriptorBuilder currentBuilder =
+                            accessorDescriptorBuilder.withPropertyDescriptor(pd.getName(), pd);
+                    buildAccessorDescriptor(currentADs, currentBuilder);
                     buildPropertyAccessors(currentBuilder, returnType, new ArrayList<>(lProcessedClasses),
                             currentADs);
                 }
