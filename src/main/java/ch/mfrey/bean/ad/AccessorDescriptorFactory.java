@@ -3,6 +3,7 @@ package ch.mfrey.bean.ad;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,10 +38,15 @@ public class AccessorDescriptorFactory {
         try {
             Set<AccessorDescriptor> currentADs = new HashSet<>();
             for (PropertyDescriptor pd : Introspector.getBeanInfo(currentClass).getPropertyDescriptors()) {
+                if (shouldIgnorePropertyDescriptor(currentClass, pd)) {
+                    continue;
+                }
+                
                 Class<?> returnType = pd.getPropertyType();
                 if (returnType.isArray()) {
                     AccessorDescriptorBuilder currentBuilder =
-                            accessorDescriptorBuilder.withPropertyDescriptor(pd.getName() + "[]", pd);
+                            accessorDescriptorBuilder.withPropertyDescriptor(pd.getName() + "[]",
+                                    new BeanPropertyDescriptor(currentClass, pd));
                     buildAccessorDescriptor(currentADs, currentBuilder);
                     buildPropertyAccessors(currentBuilder, returnType.getComponentType(),
                             new ArrayList<>(lProcessedClasses),
@@ -50,7 +56,8 @@ public class AccessorDescriptorFactory {
                     ParameterizedType parameterizedType = (ParameterizedType) pd.getReadMethod().getGenericReturnType();
                     if (parameterizedType.getActualTypeArguments()[0] instanceof Class) {
                         AccessorDescriptorBuilder currentBuilder =
-                                accessorDescriptorBuilder.withPropertyDescriptor(pd.getName() + "[]", pd);
+                                accessorDescriptorBuilder.withPropertyDescriptor(pd.getName() + "[]",
+                                        new BeanPropertyDescriptor(currentClass, pd));
                         buildAccessorDescriptor(currentADs, currentBuilder);
                         buildPropertyAccessors(currentBuilder, (Class<?>) parameterizedType.getActualTypeArguments()[0],
                                 new ArrayList<>(lProcessedClasses),
@@ -61,7 +68,8 @@ public class AccessorDescriptorFactory {
                     ParameterizedType parameterizedType = (ParameterizedType) pd.getReadMethod().getGenericReturnType();
                     if (parameterizedType.getActualTypeArguments()[0] instanceof Class) {
                         AccessorDescriptorBuilder currentBuilder =
-                                accessorDescriptorBuilder.withPropertyDescriptor(pd.getName() + "[KEY]", pd);
+                                accessorDescriptorBuilder.withPropertyDescriptor(pd.getName() + "[KEY]",
+                                        new BeanPropertyDescriptor(currentClass, pd));
                         buildAccessorDescriptor(currentADs, currentBuilder);
                         buildPropertyAccessors(currentBuilder, (Class<?>) parameterizedType.getActualTypeArguments()[0],
                                 new ArrayList<>(lProcessedClasses),
@@ -69,7 +77,8 @@ public class AccessorDescriptorFactory {
                     }
                     if (parameterizedType.getActualTypeArguments()[1] instanceof Class) {
                         AccessorDescriptorBuilder currentBuilder =
-                                accessorDescriptorBuilder.withPropertyDescriptor(pd.getName() + "[VALUE]", pd);
+                                accessorDescriptorBuilder.withPropertyDescriptor(pd.getName() + "[VALUE]",
+                                        new BeanPropertyDescriptor(currentClass, pd));
                         buildAccessorDescriptor(currentADs, currentBuilder);
                         buildPropertyAccessors(currentBuilder, (Class<?>) parameterizedType.getActualTypeArguments()[1],
                                 new ArrayList<>(lProcessedClasses),
@@ -77,7 +86,8 @@ public class AccessorDescriptorFactory {
                     }
                 } else {
                     AccessorDescriptorBuilder currentBuilder =
-                            accessorDescriptorBuilder.withPropertyDescriptor(pd.getName(), pd);
+                            accessorDescriptorBuilder.withPropertyDescriptor(pd.getName(),
+                                    new BeanPropertyDescriptor(currentClass, pd));
                     buildAccessorDescriptor(currentADs, currentBuilder);
                     buildPropertyAccessors(currentBuilder, returnType, new ArrayList<>(lProcessedClasses),
                             currentADs);
@@ -120,7 +130,9 @@ public class AccessorDescriptorFactory {
         if (scanned.containsKey(clazz)) {
             return scanned.get(clazz);
         }
-        return buildPropertyAccessors(clazz);
+        List<AccessorDescriptor> accessorDescriptors = buildPropertyAccessors(clazz);
+        scanned.put(clazz, accessorDescriptors);
+        return accessorDescriptors;
     }
 
     protected boolean shouldBuildPropertyAccessors(final List<Class<?>> processedClasses, final Class<?> currentClass,
@@ -160,4 +172,22 @@ public class AccessorDescriptorFactory {
             return o1.getFullPropertyAccessor().compareTo(o2.getFullPropertyAccessor());
         }
     }
+
+    /**
+     * Should ignore accessor.
+     *
+     * @param currentClass
+     *            the current class
+     * @param pd
+     *            the pd
+     * @return true, if successful
+     */
+    private boolean shouldIgnorePropertyDescriptor(final Class<?> currentClass, final PropertyDescriptor pd) {
+        Method readMethod = pd.getReadMethod();
+        if (currentClass == null || readMethod == null || Object.class.equals(readMethod.getDeclaringClass())) {
+            return true;
+        }
+        return false;
+    }
+
 }

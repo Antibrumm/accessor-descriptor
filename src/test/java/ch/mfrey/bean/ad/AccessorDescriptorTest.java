@@ -30,7 +30,7 @@ public class AccessorDescriptorTest {
         AccessorDescriptorFactory factory = getADFactory();
 
         List<AccessorDescriptor> accessorDescriptors = factory.getAccessorDescriptors(B.class);
-        Assert.assertEquals(23, accessorDescriptors.size());
+        Assert.assertEquals(21, accessorDescriptors.size());
         accessorDescriptors.forEach(ad -> {
             log.info("{} {}", ad.getAccessorContext().getAttribute(ONBUILD), ad);
             Assert.assertEquals(ad.getPropertyLevel(), (int) ad.getAccessorContext().getAttribute(ONBUILD));
@@ -42,7 +42,7 @@ public class AccessorDescriptorTest {
         AccessorDescriptorFactory factory = getADFactory();
 
         List<AccessorDescriptor> accessorDescriptors = factory.getAccessorDescriptors(A.class);
-        Assert.assertEquals(71, accessorDescriptors.size());
+        Assert.assertEquals(66, accessorDescriptors.size());
         accessorDescriptors.forEach(ad -> {
             log.info("{} {}", ad.getAccessorContext().getAttribute(ONBUILD), ad);
             Assert.assertEquals(ad.getPropertyLevel(), (int) ad.getAccessorContext().getAttribute(ONBUILD));
@@ -72,11 +72,12 @@ public class AccessorDescriptorTest {
     public void testLeftRight() {
         AccessorDescriptorFactory factory = getADFactory();
         List<AccessorDescriptor> accessorDescriptors = factory.getAccessorDescriptors(LeftRightNode.class);
-        Assert.assertEquals(4, accessorDescriptors.size());
+        Assert.assertEquals(3, accessorDescriptors.size());
         accessorDescriptors.forEach(ad -> {
             log.info("{} {}",
                     ad.getAccessorContext().getAttribute(ONBUILD), ad);
             Assert.assertEquals(ad.getPropertyLevel(), (int) ad.getAccessorContext().getAttribute(ONBUILD));
         });
     }
+
 }

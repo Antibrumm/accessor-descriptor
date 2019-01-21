@@ -1,6 +1,5 @@
 package ch.mfrey.bean.ad;
 
-import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +30,7 @@ public class AccessorDescriptorBuilder {
     private final List<AccessorDescriptorBuilderListener> listeners = new ArrayList<>();
 
     /** The property descriptors. */
-    protected List<PropertyDescriptor> propertyDescriptors = new ArrayList<>();
+    protected List<BeanPropertyDescriptor> beanPropertyDescriptors = new ArrayList<>();
 
     /** The type. */
     protected final Class<?> type;
@@ -75,8 +74,7 @@ public class AccessorDescriptorBuilder {
         AccessorDescriptorBuilder copy = new AccessorDescriptorBuilder(this.type, this.listeners);
         copy.fullPropertyAccessor = this.fullPropertyAccessor;
         copy.propertyAccessor = this.propertyAccessor;
-        copy.propertyDescriptors = new ArrayList<>();
-        copy.propertyDescriptors.addAll(this.propertyDescriptors);
+        copy.beanPropertyDescriptors = new ArrayList<>(this.beanPropertyDescriptors);
         copy.accessorContext = new AccessorContext(this.accessorContext);
         return copy;
     }
@@ -90,7 +88,7 @@ public class AccessorDescriptorBuilder {
     }
 
     public int getPropertyLevel() {
-        return this.propertyDescriptors.size() - 1;
+        return this.beanPropertyDescriptors.size() - 1;
     }
 
     /**
@@ -101,11 +99,11 @@ public class AccessorDescriptorBuilder {
      * @return the accessor descriptor builder
      */
     public AccessorDescriptorBuilder withPropertyDescriptor(final String name,
-            final PropertyDescriptor propertyDescriptor) {
+            final BeanPropertyDescriptor propertyDescriptor) {
         AccessorDescriptorBuilder copy = copy();
         copy.fullPropertyAccessor = copy.fullPropertyAccessor == null ? name : copy.fullPropertyAccessor + "." + name;
         copy.propertyAccessor = copy.fullPropertyAccessor.replaceAll(INDEXED_ACCESSOR_PART, "");
-        copy.propertyDescriptors.add(propertyDescriptor);
+        copy.beanPropertyDescriptors.add(propertyDescriptor);
         return copy;
     }
 
