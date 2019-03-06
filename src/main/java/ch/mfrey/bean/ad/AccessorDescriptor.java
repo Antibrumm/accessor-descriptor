@@ -3,10 +3,7 @@ package ch.mfrey.bean.ad;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 /**
  * The Class AccessorDescriptor.
@@ -139,7 +136,7 @@ public class AccessorDescriptor {
         return false;
     }
 
-    public <A extends Annotation> A getAnnotation(Class<A> annotationClass) {
+    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
         List<BeanPropertyDescriptor> bpds = getBeanPropertyDescriptors();
         for (int i = bpds.size() - 1; i >= 0; i--) {
             if (bpds.get(i).isAnnotationPresent(annotationClass)) {

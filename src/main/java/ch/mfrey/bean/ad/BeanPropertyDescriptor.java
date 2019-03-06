@@ -38,8 +38,8 @@ public class BeanPropertyDescriptor {
         return annotatedElement != null && annotatedElement.isAnnotationPresent(annotationClass);
     }
 
-    public <A extends Annotation> A getAnnotation(final Class<A> annotationClass) {
-        A annotation = propertyDescriptor.getReadMethod().getAnnotation(annotationClass);
+    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+        T annotation = propertyDescriptor.getReadMethod().getAnnotation(annotationClass);
         if (annotation != null) {
             return annotation;
         }
@@ -80,4 +80,5 @@ public class BeanPropertyDescriptor {
                 .append(propertyDescriptor).append("]");
         return builder.toString();
     }
+
 }
