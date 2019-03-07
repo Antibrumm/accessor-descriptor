@@ -12,32 +12,19 @@ public class AccessorDescriptorBuilder {
 
     public static final String INDEXED_ACCESSOR_PART = "\\[.*?\\]";
 
-    /**
-     * Builder.
-     *
-     * @param type
-     *            the type
-     * @param listeners
-     * @return the accessor descriptor builder
-     */
-    public static AccessorDescriptorBuilder builder(final Class<?> type,
-            final List<AccessorDescriptorBuilderListener> listeners) {
-        return new AccessorDescriptorBuilder(type, listeners);
-    }
-
     protected AccessorContext accessorContext;
-
-    private final List<AccessorDescriptorBuilderListener> listeners = new ArrayList<>();
 
     /** The property descriptors. */
     protected List<BeanPropertyDescriptor> beanPropertyDescriptors = new ArrayList<>();
 
-    /** The type. */
-    protected final Class<?> type;
-
     protected String fullPropertyAccessor;
 
+    private final List<AccessorDescriptorBuilderListener> listeners = new ArrayList<>();
+
     protected String propertyAccessor;
+
+    /** The type. */
+    protected final Class<?> type;
 
     /**
      * Instantiates a new accessor descriptor builder.
@@ -50,6 +37,19 @@ public class AccessorDescriptorBuilder {
         if (listeners != null) {
             this.listeners.addAll(listeners);
         }
+    }
+
+    /**
+     * Builder.
+     *
+     * @param type
+     *            the type
+     * @param listeners
+     * @return the accessor descriptor builder
+     */
+    public static AccessorDescriptorBuilder builder(final Class<?> type,
+            final List<AccessorDescriptorBuilderListener> listeners) {
+        return new AccessorDescriptorBuilder(type, listeners);
     }
 
     /**

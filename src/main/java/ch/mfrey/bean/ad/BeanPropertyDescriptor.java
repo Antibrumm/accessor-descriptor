@@ -7,55 +7,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 public class BeanPropertyDescriptor {
-    private final PropertyDescriptor propertyDescriptor;
     private final Field field;
+    private final PropertyDescriptor propertyDescriptor;
 
-    public BeanPropertyDescriptor(Class<?> beanClass, PropertyDescriptor propertyDescriptor) {
+    public BeanPropertyDescriptor(final Class<?> beanClass, final PropertyDescriptor propertyDescriptor) {
         this.propertyDescriptor = propertyDescriptor;
         this.field = findField(beanClass, propertyDescriptor.getName());
     }
 
-    public Field getField() {
-        return field;
-    }
-
-    public PropertyDescriptor getPropertyDescriptor() {
-        return propertyDescriptor;
-    }
-
-    public String getName() {
-        return propertyDescriptor.getName();
-    }
-
-    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
-        return isAnnotationPresent(field, annotationClass)
-                || isAnnotationPresent(propertyDescriptor.getReadMethod(), annotationClass)
-                || isAnnotationPresent(propertyDescriptor.getWriteMethod(), annotationClass);
-    }
-
-    public static boolean isAnnotationPresent(AnnotatedElement annotatedElement,
-            Class<? extends Annotation> annotationClass) {
-        return annotatedElement != null && annotatedElement.isAnnotationPresent(annotationClass);
-    }
-
-    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-        T annotation = propertyDescriptor.getReadMethod().getAnnotation(annotationClass);
-        if (annotation != null) {
-            return annotation;
-        }
-
-        return field != null ? field.getAnnotation(annotationClass) : null;
-    }
-
-    public boolean isTransientModifier() {
-        return field != null && Modifier.isTransient(field.getModifiers());
-    }
-
-    public boolean isStaticModifier() {
-        return field != null && Modifier.isStatic(field.getModifiers());
-    }
-
-    private static Field findField(Class<?> clazz, String name) {
+    private static Field findField(final Class<?> clazz, final String name) {
         Class<?> searchType = clazz;
         while (Object.class != searchType && searchType != null) {
             Field[] fields = searchType.getDeclaredFields();
@@ -69,8 +29,48 @@ public class BeanPropertyDescriptor {
         return null;
     }
 
+    public static boolean isAnnotationPresent(final AnnotatedElement annotatedElement,
+            final Class<? extends Annotation> annotationClass) {
+        return annotatedElement != null && annotatedElement.isAnnotationPresent(annotationClass);
+    }
+
+    public <T extends Annotation> T getAnnotation(final Class<T> annotationClass) {
+        T annotation = propertyDescriptor.getReadMethod().getAnnotation(annotationClass);
+        if (annotation != null) {
+            return annotation;
+        }
+
+        return field != null ? field.getAnnotation(annotationClass) : null;
+    }
+
+    public Field getField() {
+        return field;
+    }
+
+    public String getName() {
+        return propertyDescriptor.getName();
+    }
+
+    public PropertyDescriptor getPropertyDescriptor() {
+        return propertyDescriptor;
+    }
+
     public Class<?> getPropertyType() {
         return propertyDescriptor.getPropertyType();
+    }
+
+    public boolean isAnnotationPresent(final Class<? extends Annotation> annotationClass) {
+        return isAnnotationPresent(field, annotationClass)
+                || isAnnotationPresent(propertyDescriptor.getReadMethod(), annotationClass)
+                || isAnnotationPresent(propertyDescriptor.getWriteMethod(), annotationClass);
+    }
+
+    public boolean isStaticModifier() {
+        return field != null && Modifier.isStatic(field.getModifiers());
+    }
+
+    public boolean isTransientModifier() {
+        return field != null && Modifier.isTransient(field.getModifiers());
     }
 
     @Override

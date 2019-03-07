@@ -14,19 +14,19 @@ public class AccessorDescriptor {
 
     private final AccessorContext accessorContext;
 
-    /** The property accessor. */
-    private final String propertyAccessor;
-
     /** The property descriptors. */
     private final List<BeanPropertyDescriptor> beanPropertyDescriptors;
+
+    private final String fullPropertyAccessor;
+
+    /** The property accessor. */
+    private final String propertyAccessor;
 
     /** The property level. */
     private final int propertyLevel;
 
     /** The type. */
     private final Class<?> type;
-
-    private final String fullPropertyAccessor;
 
     /**
      * Instantiates a new accessor descriptor.
@@ -67,6 +67,24 @@ public class AccessorDescriptor {
         return accessorContext;
     }
 
+    public <T extends Annotation> T getAnnotation(final Class<T> annotationClass) {
+        List<BeanPropertyDescriptor> bpds = getBeanPropertyDescriptors();
+        for (int i = bpds.size() - 1; i >= 0; i--) {
+            if (bpds.get(i).isAnnotationPresent(annotationClass)) {
+                return bpds.get(i).getAnnotation(annotationClass);
+            }
+        }
+        return null;
+    }
+
+    public List<BeanPropertyDescriptor> getBeanPropertyDescriptors() {
+        return beanPropertyDescriptors;
+    }
+
+    public String getFullPropertyAccessor() {
+        return fullPropertyAccessor;
+    }
+
     /**
      * Gets the property accessor.
      *
@@ -83,6 +101,24 @@ public class AccessorDescriptor {
      */
     public int getPropertyLevel() {
         return propertyLevel;
+    }
+
+    /**
+     * Gets the result bean property descriptor.
+     *
+     * @return the result descriptor
+     */
+    public BeanPropertyDescriptor getResultBeanPropertyDescriptor() {
+        return beanPropertyDescriptors.get(beanPropertyDescriptors.size() - 1);
+    }
+
+    /**
+     * Gets the result descriptor.
+     *
+     * @return the result descriptor
+     */
+    public PropertyDescriptor getResultDescriptor() {
+        return getResultBeanPropertyDescriptor().getPropertyDescriptor();
     }
 
     /**
@@ -107,26 +143,7 @@ public class AccessorDescriptor {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return "AccessorDescriptor [type=" + type.getName() //$NON-NLS-1$
-                + ", propertyAccessor=" + propertyAccessor //$NON-NLS-1$
-                + ", fullPropertyAccessor=" + fullPropertyAccessor //$NON-NLS-1$
-                + ", propertyLevel=" + propertyLevel //$NON-NLS-1$
-                + ", resultType=" + getResultDescriptor().getPropertyType().getName()
-                + ", descriptors=" + beanPropertyDescriptors + "]"; //$NON-NLS-1$ //$NON-NLS-2$
-    }
-
-    public String getFullPropertyAccessor() {
-        return fullPropertyAccessor;
-    }
-
-    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
+    public boolean isAnnotationPresent(final Class<? extends Annotation> annotationClass) {
         List<BeanPropertyDescriptor> bpds = getBeanPropertyDescriptors();
         for (int i = bpds.size() - 1; i >= 0; i--) {
             if (bpds.get(i).isAnnotationPresent(annotationClass)) {
@@ -134,16 +151,6 @@ public class AccessorDescriptor {
             }
         }
         return false;
-    }
-
-    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-        List<BeanPropertyDescriptor> bpds = getBeanPropertyDescriptors();
-        for (int i = bpds.size() - 1; i >= 0; i--) {
-            if (bpds.get(i).isAnnotationPresent(annotationClass)) {
-                return bpds.get(i).getAnnotation(annotationClass);
-            }
-        }
-        return null;
     }
 
     public boolean isStaticModifier() {
@@ -166,26 +173,19 @@ public class AccessorDescriptor {
         return false;
     }
 
-    public List<BeanPropertyDescriptor> getBeanPropertyDescriptors() {
-        return beanPropertyDescriptors;
-    }
-
-    /**
-     * Gets the result bean property descriptor.
+    /*
+     * (non-Javadoc)
      *
-     * @return the result descriptor
+     * @see java.lang.Object#toString()
      */
-    public BeanPropertyDescriptor getResultBeanPropertyDescriptor() {
-        return beanPropertyDescriptors.get(beanPropertyDescriptors.size() - 1);
-    }
-
-    /**
-     * Gets the result descriptor.
-     *
-     * @return the result descriptor
-     */
-    public PropertyDescriptor getResultDescriptor() {
-        return getResultBeanPropertyDescriptor().getPropertyDescriptor();
+    @Override
+    public String toString() {
+        return "AccessorDescriptor [type=" + type.getName() //$NON-NLS-1$
+                + ", propertyAccessor=" + propertyAccessor //$NON-NLS-1$
+                + ", fullPropertyAccessor=" + fullPropertyAccessor //$NON-NLS-1$
+                + ", propertyLevel=" + propertyLevel //$NON-NLS-1$
+                + ", resultType=" + getResultDescriptor().getPropertyType().getName()
+                + ", descriptors=" + beanPropertyDescriptors + "]"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
 }

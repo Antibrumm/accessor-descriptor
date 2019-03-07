@@ -27,6 +27,15 @@ public class AccessorDescriptorFactory {
 
     private final Map<Class<?>, List<AccessorDescriptor>> scanned = new HashMap<>();
 
+    private AccessorDescriptorBuilder buildAccessorDescriptor(final Set<AccessorDescriptor> currentADs,
+            final AccessorDescriptorBuilder currentBuilder) {
+        AccessorDescriptor accessorDescriptor = currentBuilder.build();
+        if (currentADs.add(accessorDescriptor)) {
+            log.debug("Found: {}", accessorDescriptor); //$NON-NLS-1$
+        }
+        return currentBuilder;
+    }
+
     protected void buildPropertyAccessors(final AccessorDescriptorBuilder accessorDescriptorBuilder,
             final Class<?> currentClass, final List<Class<?>> processedClasses,
             final Set<AccessorDescriptor> accessorDescriptors) {
@@ -41,7 +50,7 @@ public class AccessorDescriptorFactory {
                 if (shouldIgnorePropertyDescriptor(currentClass, pd)) {
                     continue;
                 }
-                
+
                 Class<?> returnType = pd.getPropertyType();
                 if (returnType.isArray()) {
                     AccessorDescriptorBuilder currentBuilder =
@@ -99,15 +108,6 @@ public class AccessorDescriptorFactory {
         }
     }
 
-    private AccessorDescriptorBuilder buildAccessorDescriptor(Set<AccessorDescriptor> currentADs,
-            AccessorDescriptorBuilder currentBuilder) {
-        AccessorDescriptor accessorDescriptor = currentBuilder.build();
-        if (currentADs.add(accessorDescriptor)) {
-            log.debug("Found: {}", accessorDescriptor); //$NON-NLS-1$
-        }
-        return currentBuilder;
-    }
-
     /**
      * Builds the property accessors.
      *
@@ -149,6 +149,23 @@ public class AccessorDescriptorFactory {
         return true;
     }
 
+    /**
+     * Should ignore accessor.
+     *
+     * @param currentClass
+     *            the current class
+     * @param pd
+     *            the pd
+     * @return true, if successful
+     */
+    private boolean shouldIgnorePropertyDescriptor(final Class<?> currentClass, final PropertyDescriptor pd) {
+        Method readMethod = pd.getReadMethod();
+        if (currentClass == null || readMethod == null || Object.class.equals(readMethod.getDeclaringClass())) {
+            return true;
+        }
+        return false;
+    }
+
     private List<AccessorDescriptor> toSortedList(final Set<AccessorDescriptor> acs) {
         List<AccessorDescriptor> accessorDescriptors = new ArrayList<>(acs);
         accessorDescriptors.sort(new AccessorDescriptorComparator());
@@ -171,23 +188,6 @@ public class AccessorDescriptorFactory {
             }
             return o1.getFullPropertyAccessor().compareTo(o2.getFullPropertyAccessor());
         }
-    }
-
-    /**
-     * Should ignore accessor.
-     *
-     * @param currentClass
-     *            the current class
-     * @param pd
-     *            the pd
-     * @return true, if successful
-     */
-    private boolean shouldIgnorePropertyDescriptor(final Class<?> currentClass, final PropertyDescriptor pd) {
-        Method readMethod = pd.getReadMethod();
-        if (currentClass == null || readMethod == null || Object.class.equals(readMethod.getDeclaringClass())) {
-            return true;
-        }
-        return false;
     }
 
 }
